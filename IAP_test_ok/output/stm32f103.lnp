@@ -1,0 +1,28 @@
+--cpu Cortex-M3
+".\output\core_cm3.o"
+".\output\stm32f10x_it.o"
+".\output\startup_stm32f10x_md.o"
+".\output\system_stm32f10x.o"
+".\output\misc.o"
+".\output\stm32f10x_gpio.o"
+".\output\stm32f10x_rcc.o"
+".\output\stm32f10x_usart.o"
+".\output\stm32f10x_can.o"
+".\output\stm32f10x_tim.o"
+".\output\stm32f10x_flash.o"
+".\output\stm32f10x_i2c.o"
+".\output\stm32f10x_iwdg.o"
+".\output\main.o"
+".\output\crc.o"
+".\output\ymodem.o"
+".\output\u2_can_agreement.o"
+".\output\at24c0x.o"
+".\output\inttostring.o"
+".\output\can.o"
+".\output\jumpapp.o"
+".\output\usart_1.o"
+".\output\system_init.o"
+--strict --scatter ".\output\stm32f103.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list ".\listing\stm32f103.map" -o .\output\stm32f103.axf
