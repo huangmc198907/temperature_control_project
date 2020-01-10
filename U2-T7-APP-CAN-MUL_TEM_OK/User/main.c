@@ -53,6 +53,7 @@ void vTask_Put_CAN( void *pvParameters );//CAN发送任务
 void vTask_CAN_afreement( void *pvParameters );//CAN协议任务
 void vTask_HeartBeat( void *pvParameters );//心跳监测任务
 void vTask_ADC( void *pvParameters );//ADC任务
+void vTask_LED( void *pvParameters );//LED task
 
 void Load_EEPROM_Parameter(void);
 
@@ -74,6 +75,7 @@ int main(void)
 	xTaskCreate( vTask_CAN_afreement, "Task CAN_afreement", 100, NULL, 4, NULL );
 	xTaskCreate( vTask_HeartBeat, "Task HeartBea", 100, NULL, 2, NULL );
 	xTaskCreate( vTask_ADC, "Task ADC", 600, NULL, 1, NULL );
+	xTaskCreate( vTask_LED, "Task LED", 100, NULL, 4, NULL );
 	
 	Printf_buff_date("This is app!\n");
 	vTaskStartScheduler();
@@ -81,6 +83,22 @@ int main(void)
 	while(1);
 }
 
+void vTask_LED( void *pvParameters )
+{
+	portTickType xLastWakeTime;
+	
+	while(1)
+	{
+		GPIO_ResetBits(GPIOA, GPIO_Pin_9);
+		IWDG_ReloadCounter();
+		vTaskDelayUntil( &xLastWakeTime, 50/portTICK_RATE_MS);
+		GPIO_SetBits(GPIOA, GPIO_Pin_9);
+		IWDG_ReloadCounter();
+		vTaskDelayUntil( &xLastWakeTime, 50/portTICK_RATE_MS);
+	}
+	
+	vTaskDelete(NULL);
+}
 
 void vTask_Printf( void *pvParameters )
 {
@@ -232,12 +250,22 @@ void vTask_CAN_afreement( void *pvParameters )
 					}
 					if(0x01 == get_CAN_teep.dates[0])
 					{
+						  unsigned int teep = 0;
 //						if(1 == get_CAN_teep.dates[1])
 //						{
 							teep = ADC_data_buff[get_CAN_teep.dates[1]-1];
 //							teep = teep*TEMP_a[1]+TEMP_b[1]-99.54;
-							teep = teep*TEMP_a[get_CAN_teep.dates[1]-1]+TEMP_b[get_CAN_teep.dates[1]-1];
-							temp = PT100_Temp_s(teep, &put_CAN_teep.dates[2]);
+							//teep = teep*TEMP_a[get_CAN_teep.dates[1]-1]+TEMP_b[get_CAN_teep.dates[1]-1];
+							//temp = PT100_Temp_s(teep, &put_CAN_teep.dates[2]);
+						  temp = 4;
+						  put_CAN_teep.dates[2] = (teep) & 0xff;
+						  put_CAN_teep.dates[3] = (teep >> 8) & 0xff;
+						  put_CAN_teep.dates[4] = (teep >> 16) & 0xff;
+						  put_CAN_teep.dates[5] = (teep >> 24) & 0xff;
+						  
+						 
+						  
+						  
 							
 							put_CAN_teep.ID = APP_MISO_CHANNEL;
 							put_CAN_teep.number = 2+temp;

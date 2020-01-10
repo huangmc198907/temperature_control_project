@@ -246,6 +246,25 @@ uint8_t Get_USART2(void)
 	return teep;
 }
 
+#if 0
+#define ITM_Port8(n)    (*((volatile unsigned char *)(0xE0000000+4*n)))
+#define ITM_Port16(n)   (*((volatile unsigned short*)(0xE0000000+4*n)))
+#define ITM_Port32(n)   (*((volatile unsigned long *)(0xE0000000+4*n)))
+#define DEMCR           (*((volatile unsigned long *)(0xE000EDFC)))
+#define TRCENA          0x01000000
+
+ErrorStatus printf_USART2(char* string)
+{
+	while(*string){
+	  if (DEMCR & TRCENA){
+			while (ITM_Port32(0) == 0);
+			ITM_Port8(0) = *string;
+			string++;
+		}
+	}
+	return SUCCESS;
+}
+#else
 ErrorStatus printf_USART2(char* string)
 {
 	unsigned char number_teep;
@@ -273,6 +292,7 @@ ErrorStatus printf_USART2(char* string)
 	
 	return ERROR;
 }
+#endif
 #endif
 
 
